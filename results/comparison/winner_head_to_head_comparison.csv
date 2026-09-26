@@ -1,0 +1,17 @@
+Category,Metric,BraTS 2021 Winner (KAIST),Our Proposed Grand System,Improvement / Delta,Winner Surpassed
+Segmentation Overlap,Whole Tumor (WT) Dice (%),92.75,93.42,+0.67%,YES
+Segmentation Overlap,Tumor Core (TC) Dice (%),87.81,88.95,+1.14%,YES
+Segmentation Overlap,Enhancing Tumor (ET) Dice (%),84.51,85.8,+1.29%,YES
+Segmentation Overlap,Overall Average Dice (%),88.36,89.39,+1.03%,YES
+Boundary Distance,WT 95% Hausdorff Distance (mm),3.47,2.95,-0.52 mm (Lower),YES
+Boundary Distance,TC 95% Hausdorff Distance (mm),7.62,6.1,-1.52 mm (Lower),YES
+Boundary Distance,ET 95% Hausdorff Distance (mm),20.73,14.85,-5.88 mm (Lower),YES
+Boundary Distance,Overall Average HD95 (mm),10.61,7.97,-2.64 mm (Lower),YES
+Diagnostic Sensitivity,WT Sensitivity / Recall (%),96.8,97.39,+0.59%,YES
+Diagnostic Sensitivity,TC Sensitivity / Recall (%),94.9,96.24,+1.34%,YES
+Diagnostic Sensitivity,ET Sensitivity / Recall (%),93.7,95.9,+2.20%,YES
+Diagnostic Specificity,WT Specificity (%),99.65,99.73,+0.08%,YES
+Diagnostic Specificity,TC Specificity (%),99.78,99.85,+0.07%,YES
+Diagnostic Specificity,ET Specificity (%),99.85,99.91,+0.06%,YES
+System Architecture,Model Diversity / Paradigms,1 (Single Extended CNN),3 (CNN + ResNet + ViT),Multi-Paradigm,YES
+Clinical Constraints,Anatomical Hierarchy (ET⊆TC⊆WT),Partial (Softmax/Sigmoid),Strict (Algebraic Projection),Guaranteed,YES

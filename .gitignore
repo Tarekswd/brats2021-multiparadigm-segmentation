@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Checkpoints and large binary weights (exceeding GitHub 100MB limit)
+experiments/*/checkpoints/*.pt
+experiments/*/checkpoints/*.pth
+*.pt
+*.pth
+
+# Dataset (BraTS 2021 mpMRI NIfTI files)
+data/
+*.nii
+*.nii.gz
+
+# Environment & IDE
+.vscode/
+.idea/
+.venv/
+env/
+venv/
+*.log
+
+# Submission bundles & scratch
+tarek_submission_bundle/
+*.tmp

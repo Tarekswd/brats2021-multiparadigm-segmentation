@@ -1,0 +1,24 @@
+ensemble:
+  strategy: "weighted_average"  # options: simple_average, weighted_average, voting, learned_fusion
+  models:
+    - name: "winner_unet"
+      checkpoint: "experiments/winner_unet/checkpoints/best_model.pt"
+      config: "configs/winner_unet.yaml"
+      initial_weight: 0.45
+    - name: "segresnet"
+      checkpoint: "experiments/segresnet/checkpoints/best_model.pt"
+      config: "configs/segresnet.yaml"
+      initial_weight: 0.35
+    - name: "swin_unetr"
+      checkpoint: "experiments/swin_unetr/checkpoints/best_model.pt"
+      config: "configs/swin_unetr.yaml"
+      initial_weight: 0.20
+
+  optimize_weights: true
+  use_tta: true
+
+postprocessing:
+  et_min_voxels: 200
+  min_component_size: 10
+  enforce_hierarchy: true
+  threshold: 0.5

@@ -1,0 +1,24 @@
+system:
+  name: "BraTS2021_Enhanced_Winning_Ensemble"
+  description: "Synergistic Multi-Paradigm Ensemble (Extended Winner CNN + SegResNet + Swin UNETR) with Anatomical Constraint and Calibrated ET Post-Processing"
+
+components:
+  winner_unet:
+    config: "configs/winner_unet.yaml"
+    role: "Local boundary delineation & high-capacity feature extraction"
+  segresnet:
+    config: "configs/segresnet.yaml"
+    role: "Residual regularized dense feature modeling"
+  swin_unetr:
+    config: "configs/swin_unetr.yaml"
+    role: "Global contextual & long-range relational multi-modal attention"
+
+ensemble:
+  fusion: "weighted_probability_average"
+  weights: [0.45, 0.35, 0.20]
+  out_of_fold_validated: true
+
+refinement:
+  anatomical_consistency: true  # Enforces ET ⊆ TC ⊆ WT
+  et_threshold_filter: 200     # Luu & Park false-positive suppression rule
+  connected_component_cleanup: 10

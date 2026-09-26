@@ -1,0 +1,51 @@
+dataset:
+  root: "data/BraTS2021"
+  norm_method: "zscore"
+  tight_crop: true
+  add_foreground_channel: false
+  target_mode: "regions"
+
+model:
+  name: "winner_unet"
+  in_channels: 4
+  num_classes: 3
+  use_large_encoder: true
+  norm_type: "group"
+  num_groups: 32
+  deep_supervision: true
+  axial_attention: false
+
+training:
+  batch_size: 2
+  patch_size: [128, 128, 128]
+  epochs: 300
+  optimizer: "sgd"
+  learning_rate: 0.01
+  weight_decay: 0.00003
+  scheduler: "polynomial"
+  amp: true
+  gradient_accumulation_steps: 1
+  gradient_clip_norm: 12.0
+  early_stopping_patience: 40
+
+loss:
+  name: "dice_ce"
+  batch_dice: true
+  deep_supervision: true
+  deep_supervision_weights: [0.5, 0.3, 0.2]
+
+augmentation:
+  enabled: true
+  flip_prob: 0.5
+  rot90_prob: 0.3
+  gamma_prob: 0.3
+
+postprocessing:
+  et_min_voxels: 200
+  min_component_size: 10
+  enforce_hierarchy: true
+
+inference:
+  roi_size: [128, 128, 128]
+  overlap: 0.5
+  tta: false

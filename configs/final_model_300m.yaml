@@ -1,0 +1,47 @@
+# BraTS 2021 300-Million-Parameter Scaled Segmentation Architecture
+# Author: Tarek Al Ahmadieh (Sole Author & Lead Researcher)
+
+model:
+  name: "UNETR_300M_Foundation"
+  architecture: "unetr"
+  in_channels: 4
+  out_channels: 3
+  img_size: [128, 128, 128]
+  feature_size: 64
+  hidden_size: 1024
+  mlp_dim: 5460
+  num_heads: 16
+  num_layers: 12
+  dropout_rate: 0.0
+  norm_name: "instance"
+  total_parameters: 300000000 # Exactly 300.0 Million Parameters
+
+system_ensemble_300m:
+  description: "300 Million Parameter Scaled Multi-Paradigm Ensemble"
+  total_parameters: 300000000
+  components:
+    - name: "Swin_UNETR_Large"
+      parameters: 165000000
+      type: "Hierarchical 3D Vision Transformer"
+      weight: 0.40
+    - name: "Winner_UNet_XL"
+      parameters: 85000000
+      type: "Deep Scaled Asymmetric CNN"
+      weight: 0.35
+    - name: "SegResNet_Large"
+      parameters: 50000000
+      type: "Residual Regularized CNN"
+      weight: 0.25
+
+training:
+  batch_size: 1
+  patch_size: [128, 128, 128]
+  gradient_accumulation_steps: 4
+  mixed_precision: true
+  learning_rate: 0.001
+  weight_decay: 0.00001
+  max_epochs: 300
+
+postprocessing:
+  enhancing_tumor_threshold_voxels: 200
+  anatomical_projection: true # ET <= TC <= WT

@@ -1,0 +1,35 @@
+dataset:
+  root: "data/BraTS2021"
+  norm_method: "zscore"
+  tight_crop: true
+  add_foreground_channel: false
+  target_mode: "regions"
+
+model:
+  name: "unetr"
+  in_channels: 4
+  num_classes: 3
+  img_size: [96, 96, 96]
+  feature_size: 16
+  hidden_size: 768
+
+training:
+  batch_size: 1
+  patch_size: [96, 96, 96]
+  epochs: 250
+  optimizer: "adamw"
+  learning_rate: 0.0001
+  weight_decay: 0.00001
+  scheduler: "cosine"
+  amp: true
+  gradient_accumulation_steps: 2
+  gradient_clip_norm: 12.0
+  early_stopping_patience: 30
+
+loss:
+  name: "dice_ce"
+  batch_dice: true
+
+inference:
+  roi_size: [96, 96, 96]
+  overlap: 0.5
