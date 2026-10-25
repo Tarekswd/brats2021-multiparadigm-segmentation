@@ -30,12 +30,16 @@ def main():
     parser.add_argument("--output-dir", type=str, default=None, help="Output directory for logs and weights")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--epochs", type=int, default=None, help="Override epoch count")
+    parser.add_argument("--data-root", type=str, default=None, help="Override dataset root (folder of BraTS2021_XXXXX cases)")
+    parser.add_argument("--num-workers", type=int, default=0, help="DataLoader workers")
     args = parser.parse_args()
 
     set_seed(args.seed)
     cfg = load_config(args.config)
     if args.epochs is not None:
         cfg["training"]["epochs"] = args.epochs
+    if args.data_root is not None:
+        cfg["dataset"]["root"] = args.data_root
 
     model_name = cfg.get("model", {}).get("name", "model")
     out_dir = args.output_dir or f"experiments/{model_name}"
@@ -56,6 +60,9 @@ def main():
 
     # Locate dataset subjects
     data_root = Path(cfg["dataset"]["root"])
+    if not data_root.exists() and args.data_root is not None:
+        # never silently fall back to mock data when real data was requested
+        raise FileNotFoundError(f"--data-root {data_root} does not exist")
     if not data_root.exists():
         logger.warning(f"Data root {data_root} does not exist. Creating synthetic mock data for validation pipeline.")
         data_root.mkdir(parents=True, exist_ok=True)
@@ -73,6 +80,9 @@ def main():
     if rec["tier"] == "cpu_or_low_memory":
         patch_size = tuple(rec["patch_size"])
         batch_size = rec["batch_size"]
+        cfg.setdefault("inference", {})
+        cfg["inference"]["roi_size"] = list(patch_size)
+        cfg["inference"]["overlap"] = 0.0
     else:
         patch_size = tuple(cfg["training"].get("patch_size", rec["patch_size"]))
         batch_size = cfg["training"].get("batch_size", rec["batch_size"])
@@ -95,8 +105,8 @@ def main():
         add_foreground_channel=cfg["dataset"].get("add_foreground_channel", False)
     )
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=args.num_workers)
+    val_loader = DataLoader(val_dataset, batch_size=1, shuffle=False, num_workers=args.num_workers)
 
     trainer = BraTSTrainer(
         model=model,

@@ -10,8 +10,18 @@ from typing import Dict, Any, List
 import pandas as pd
 
 
+class FlushStreamHandler(logging.StreamHandler):
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
+
+class FlushFileHandler(logging.FileHandler):
+    def emit(self, record):
+        super().emit(record)
+        self.flush()
+
 def get_logger(name: str = "BraTS2021", log_file: str = None) -> logging.Logger:
-    """Create and configure a multi-handler logger (stdout + optional log file)."""
+    """Create and configure a multi-handler logger (stdout + optional log file) with immediate flush."""
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     logger.handlers = []
@@ -21,14 +31,14 @@ def get_logger(name: str = "BraTS2021", log_file: str = None) -> logging.Logger:
         datefmt="%Y-%m-%d %H:%M:%S"
     )
 
-    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler = FlushStreamHandler(sys.stdout)
     console_handler.setFormatter(formatter)
     logger.addHandler(console_handler)
 
     if log_file:
         p = Path(log_file)
         p.parent.mkdir(parents=True, exist_ok=True)
-        file_handler = logging.FileHandler(p, encoding="utf-8")
+        file_handler = FlushFileHandler(p, encoding="utf-8")
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
 

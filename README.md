@@ -8,7 +8,11 @@
 
 A complete, reproducible, research-grade deep learning system for the **RSNA-ASNR-MICCAI BraTS 2021 Challenge** (Task 1: Brain Tumor Segmentation). 
 
-This repository reproduces key innovations from the BraTS 2021 winning submission (**KAIST MRI Lab — Luu & Park, arXiv:2112.04653**), the 2nd-place entry (**SegResNet**), and the leading 3D Vision Transformer (**Swin UNETR**), and introduces a synergistic multi-paradigm ensemble that surpasses individual challenge winners on both Dice overlap and boundary distance metrics.
+This repository implements architectures inspired by the BraTS 2021 winning submission (**KAIST MRI Lab — Luu & Park, arXiv:2112.04653**), the 2nd-place entry (**SegResNet**), and the 3D Vision Transformer **Swin UNETR**, plus a multi-paradigm ensemble pipeline.
+
+> **Project status: no model has been trained or evaluated on the real BraTS 2021 dataset yet.**
+> All runs so far used 4 small synthetic mock volumes to check that the pipeline runs end to end.
+> The tables, figures and `research_report.*` files under `results/` and `submission_package/` are **illustrative placeholders, not measured results**. They will be replaced once real training finishes; see [CLOUD_TRAINING.md](CLOUD_TRAINING.md).
 
 ---
 
@@ -33,18 +37,14 @@ This repository reproduces key innovations from the BraTS 2021 winning submissio
 
 ## Key Architecture & Benchmark Highlights
 
-| Model Architecture | WT Dice (%) | TC Dice (%) | ET Dice (%) | WT HD95 (mm) | TC HD95 (mm) | ET HD95 (mm) | Avg HD95 (mm) |
-|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **3D U-Net Baseline** | 90.12 | 84.30 | 80.45 | 6.82 | 14.20 | 26.50 | 15.84 |
-| **nnU-Net Baseline (BraTS 2020 Winner)** | 92.63 | 87.45 | 83.73 | 3.55 | 10.56 | 22.44 | 12.18 |
-| **Winner-Inspired U-Net (KAIST 2021 Winner)** | 92.75 | 87.81 | 84.51 | 3.47 | 7.62 | 20.73 | 10.61 |
-| **SegResNet (2nd Place Entry)** | 92.48 | 87.60 | 83.95 | 3.80 | 8.15 | 21.30 | 11.08 |
-| **UNETR (ViT Baseline)** | 91.50 | 85.90 | 81.80 | 5.10 | 11.80 | 24.10 | 13.67 |
-| **Swin UNETR (Hierarchical Shifted-Window ViT)** | 92.80 | 87.75 | 84.10 | 3.65 | 8.05 | 21.00 | 10.90 |
-| **Ensemble (Simple Probability Average)** | 93.15 | 88.40 | 85.20 | 3.20 | 6.95 | 18.50 | 9.55 |
-| **Final Proposed System (OOF Weighted + Winner Post-Processing)** | **93.42** | **88.95** | **85.80** | **2.95** | **6.10** | **14.85** | **7.97** |
+**Measured results: none yet.** No model has been trained on real BraTS 2021 data. This section will report the real per-epoch validation Dice and HD95 from `experiments/<run>/training_log.csv` once a cloud GPU run has finished ([CLOUD_TRAINING.md](CLOUD_TRAINING.md)).
 
-*Validated across 5-fold patient-level cross-validation without data leakage.*
+| Model Architecture | WT Dice (%) | TC Dice (%) | ET Dice (%) | Data / split |
+|:---|:---:|:---:|:---:|:---|
+| 3D U-Net Baseline | pending | pending | pending | BraTS 2021 training set, 75/25 patient-level hold-out |
+| Winner-Inspired U-Net | pending | pending | pending | same split |
+
+For reference, published BraTS 2021 results come from the official challenge papers (e.g. Luu & Park, arXiv:2112.04653). They are not results of this repository.
 
 ---
 
@@ -139,7 +139,7 @@ Train any model using its corresponding YAML configuration:
 
 ```bash
 # Train BraTS 2021 Winner-Inspired U-Net (KAIST reproduction)
-python scripts/train.py --config configs/winner_unet.yaml --output-dir experiments/winner_unet
+python scripts/train.py --config configs/winner_unet.yaml --data-root /path/to/BraTS2021 --output-dir experiments/winner_unet
 
 # Train SegResNet Baseline
 python scripts/train.py --config configs/segresnet.yaml --output-dir experiments/segresnet
@@ -219,11 +219,13 @@ python scripts/error_analysis.py
 
 ## Ablation Findings
 
-1. **Enlarged Encoder (+0.35% Dice):** Doubling encoder channels (up to 512) significantly enhances feature representation for heterogeneous necrotic cores.
-2. **Group Normalization (+0.25% Dice):** Replacing BatchNorm with GroupNorm (32 groups) completely eliminates small-batch statistics instability in 3D patches.
-3. **Deep Supervision (+0.30% Dice):** Multi-resolution auxiliary sigmoid heads provide direct gradients to earlier layers.
-4. **ET Thresholding (< 200 voxels, -5.88 mm HD95):** Remapping small spurious ET detections to necrotic core dramatically cuts false positives.
-5. **Multi-Paradigm Fusion (+0.60% Dice, -2.64 mm HD95):** CNNs provide local edge precision while Swin UNETR provides broad contextual guidance.
+No ablations have been run yet. The design choices below are implemented, but their effect on this codebase has not been measured:
+
+1. **Enlarged encoder** (channels up to 512)
+2. **Group Normalization** instead of BatchNorm
+3. **Deep supervision** with auxiliary heads
+4. **ET thresholding** (small ET components < 200 voxels remapped to necrotic core)
+5. **Multi-paradigm fusion** of CNN and Swin UNETR outputs
 
 ---
 

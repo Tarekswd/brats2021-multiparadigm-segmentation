@@ -111,7 +111,12 @@ class BraTSTrainer:
                 self.scaler.update()
                 self.optimizer.zero_grad()
 
-            total_loss += loss.item() * self.grad_accum_steps
+            loss_val = loss.item() * self.grad_accum_steps
+            total_loss += loss_val
+            self.logger.info(
+                f"[Epoch {epoch:02d}] Step {step+1}/{len(self.train_loader)}: "
+                f"Batch Loss = {loss_val:.4f} (Dice={loss_dict.get('dice', torch.tensor(0.0)).item():.4f}, CE={loss_dict.get('ce', torch.tensor(0.0)).item():.4f})"
+            )
 
         return total_loss / max(1, len(self.train_loader))
 
@@ -123,7 +128,9 @@ class BraTSTrainer:
         total_val_loss = 0.0
 
         with torch.no_grad():
-            for batch in self.val_loader:
+            for v_idx, batch in enumerate(self.val_loader):
+                sub_id = batch.get("subject_id", [f"sub_{v_idx}"])[0]
+                self.logger.info(f"Validating patient {v_idx+1}/{len(self.val_loader)} ({sub_id})...")
                 images = batch["image"].to(self.device)
                 targets = batch["target"].to(self.device)
 
