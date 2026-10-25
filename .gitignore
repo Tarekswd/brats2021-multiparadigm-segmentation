@@ -8,9 +8,19 @@ experiments/*/checkpoints/*.pt
 experiments/*/checkpoints/*.pth
 *.pt
 *.pth
+experiments/
+
+# Zip archives and submission packages
+*.zip
+submission_package/
+tarek_submission_bundle/
+
+# Separate nested repositories
+brats2021_task1/
+brats2021_task2/
 
 # Dataset (BraTS 2021 mpMRI NIfTI files)
-data/
+/data/
 *.nii
 *.nii.gz
 
@@ -21,7 +31,4 @@ data/
 env/
 venv/
 *.log
-
-# Submission bundles & scratch
-tarek_submission_bundle/
 *.tmp
