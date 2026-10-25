@@ -9,8 +9,8 @@ This produces the first **measured** results for this repository. Report only wh
 3. Under **Settings**, set the accelerator to **GPU** and turn **Internet on**.
 4. Check the mount path and extract the training archive to local disk:
    ```bash
-   !ls /kaggle/input/brats-2021-task1
-   !mkdir -p /tmp/brats && tar -xf /kaggle/input/brats-2021-task1/BraTS2021_Training_Data.tar -C /tmp/brats && ls /tmp/brats | head && ls /tmp/brats | wc -l
+   !ls /kaggle/input/datasets/dschettler8845/brats-2021-task1
+   !mkdir -p /tmp/brats && tar -xf /kaggle/input/datasets/dschettler8845/brats-2021-task1/BraTS2021_Training_Data.tar -C /tmp/brats && ls /tmp/brats | head && ls /tmp/brats | wc -l
    ```
    You should see `BraTS2021_XXXXX/` folders, each with `*_flair/_t1/_t1ce/_t2/_seg.nii.gz` files. If the archive unpacks into a sub-folder, point `--data-root` at that sub-folder.
 
@@ -31,6 +31,7 @@ python scripts/train.py --config configs/baseline_unet.yaml --data-root /tmp/bra
 - `train.py` makes a seeded 75/25 patient-level train/validation split and validates on the full held-out volumes every epoch. That is not 5-fold cross-validation, so don't call it that.
 - The script stops if `--data-root` doesn't exist. It never falls back to mock data when the flag is given.
 - There is no resume-from-checkpoint. Time the first epoch, then pick an `--epochs` value that fits inside one Kaggle session.
+- Measured on a Kaggle T4: one epoch on 40 cases (30 train, 10 validated) took 97.6 s. On the full 1251 cases, one epoch took over 25 minutes and had validated only 154 cases when it was stopped. So `--epochs 30` will **not** fit in one session; start with a few epochs, or symlink a subset folder as `--data-root` to iterate faster.
 - Run other configs (`winner_unet.yaml`, `segresnet.yaml`, `swin_unetr.yaml`) the same way, each in its own output directory.
 
 ## 3. Summarise honestly
