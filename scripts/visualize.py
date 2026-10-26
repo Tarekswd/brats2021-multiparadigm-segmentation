@@ -1,21 +1,16 @@
 """
-Publication Figures Generator for BraTS 2021 (Section 39: Figures 1 to 13).
+Pipeline diagram generator for BraTS 2021 (Figure 1).
 Usage:
     python scripts/visualize.py [--output-dir results/figures]
 """
 
 import sys
 from pathlib import Path
-import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.visualization.slices import plot_multimodal_slices, create_brats_cmap
-from src.visualization.metrics import plot_model_comparison_bar
-from src.visualization.error_analysis import plot_error_analysis_case
 from src.utils.logging import get_logger
 
 
@@ -67,62 +62,15 @@ def generate_pipeline_figure(output_path: str):
     plt.close()
 
 
-def generate_ablation_figure(output_path: str):
-    """Figure 13: Ablation Results Waterfall Chart."""
-    fig, ax = plt.subplots(figsize=(11, 6))
-    mods = [
-        "Base nnU-Net",
-        "+ Large Encoder",
-        "+ GroupNorm (32g)",
-        "+ Deep Supervision",
-        "+ Foreground Channel",
-        "+ Axial Attention",
-        "+ Multi-Model Ensemble",
-        "+ Winner Post-Processing"
-    ]
-    avg_dices = [87.94, 88.15, 88.24, 88.36, 88.45, 88.42, 88.92, 89.39]
-
-    bars = ax.barh(mods, avg_dices, color="#3b82f6", edgecolor="#1d4ed8", height=0.6)
-    ax.set_xlim(85.0, 91.0)
-    ax.set_xlabel("Average Validation Dice (%)", fontsize=11, fontweight="bold")
-    ax.set_title("Figure 13: Ablation Study — Incremental Impact Across Architecture Components", fontsize=12, fontweight="bold")
-    ax.grid(axis="x", linestyle="--", alpha=0.6)
-
-    for bar, val in zip(bars, avg_dices):
-        ax.text(val + 0.1, bar.get_y() + bar.get_height() / 2, f"{val:.2f}%", va="center", fontsize=10, fontweight="bold")
-
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=300)
-    plt.close()
-
-
 def main():
     logger = get_logger("VisualizeCLI")
     out_dir = Path("results/figures")
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    logger.info("Rendering all publication figures...")
+    logger.info("Rendering pipeline diagram...")
 
     # Figure 1: Pipeline
     generate_pipeline_figure(str(out_dir / "figure1_pipeline.png"))
-
-    # Figures 2, 3, 4: Synthetic representative slice
-    d, h, w = 155, 240, 240
-    mri = np.zeros((4, d, h, w), dtype=np.float32)
-    mri[0, 50:110, 60:180, 60:180] = 0.5  # T1
-    mri[1, 50:110, 60:180, 60:180] = 0.6  # T1ce
-    mri[2, 50:110, 60:180, 60:180] = 0.7  # T2
-    mri[3, 50:110, 60:180, 60:180] = 0.8  # FLAIR
-
-    gt = np.zeros((d, h, w), dtype=np.uint8)
-    gt[70:95, 100:145, 100:145] = 2  # Edema
-    gt[75:90, 110:135, 110:135] = 1  # Necrotic
-    gt[78:88, 115:130, 115:130] = 4  # Enhancing
-
-    plot_multimodal_slices(mri, gt, slice_idx=82, output_png_path=str(out_dir / "figure2_mri_modalities_and_labels.png"))
-
-    # Figure 13: Ablation
-    generate_ablation_figure(str(out_dir / "figure13_ablation_results.png"))
 
     logger.info("Figures generated in results/figures/")
 

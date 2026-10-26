@@ -12,7 +12,7 @@ This repository implements architectures inspired by the BraTS 2021 winning subm
 
 > **Project status: one real-data run so far** — the 3D U-Net baseline, 5 epochs on the BraTS 2021 training set (see the table below).
 > All other architectures are implemented but **not yet trained on real data**.
-> The other tables, figures and `research_report.*` files under `results/` and `submission_package/` are **illustrative placeholders, not measured results**. Only `results/measured/` holds measured numbers. See [CLOUD_TRAINING.md](CLOUD_TRAINING.md) to reproduce.
+> Earlier versions of this repository contained invented benchmark tables, figures and a research report; they have been removed. Measured numbers live only in `results/measured/`. See [CLOUD_TRAINING.md](CLOUD_TRAINING.md) to reproduce.
 
 ---
 
@@ -27,7 +27,7 @@ This repository implements architectures inspired by the BraTS 2021 winning subm
 8. [Case Inference & Prediction](#case-inference--prediction)
 9. [Evaluation & Metric Conventions](#evaluation--metric-conventions)
 10. [Multi-Paradigm Ensembling](#multi-paradigm-ensembling)
-11. [Publication Visualizations](#publication-visualizations)
+11. [Pipeline Diagram](#pipeline-diagram)
 12. [Hardware Requirements & Expected Runtime](#hardware-requirements--expected-runtime)
 13. [Ablation Findings](#ablation-findings)
 14. [Citation](#citation)
@@ -82,16 +82,16 @@ brats2021_research/
 │   ├── predict.py            # Case prediction CLI with NIfTI restoration
 │   ├── evaluate.py           # Patient-level metric evaluation CLI
 │   ├── ensemble.py           # Ensemble fusion CLI
-│   ├── compare_models.py     # Benchmark comparison table generator
-│   ├── error_analysis.py     # Hard case visualizer
-│   └── visualize.py          # Publication figures generator (Figs 1-13)
+│   └── visualize.py          # Pipeline diagram (Figure 1)
 ├── tests/                    # Comprehensive unit test suite
 ├── experiments/              # Model weights and logs
-├── results/                  # Final figures, tables, and reports
+├── results/
+│   ├── figures/figure1_pipeline.png   # Pipeline diagram
+│   └── measured/             # Measured training logs from real-data runs
 ├── requirements.txt
 ├── environment.yml
-├── LICENSE
-└── research_report.md        # Publication-grade 24-section scientific report
+├── CLOUD_TRAINING.md         # How to train on a Kaggle GPU
+└── LICENSE
 ```
 
 ---
@@ -202,13 +202,11 @@ python scripts/ensemble.py --config configs/ensemble.yaml --output-dir results/e
 
 ---
 
-## Publication Visualizations
+## Pipeline Diagram
 
-Generate the complete publication figure suite (Figures 1 through 13):
+Regenerate the pipeline diagram (`results/figures/figure1_pipeline.png`):
 ```bash
-python scripts/visualize.py --output-dir results/figures
-python scripts/compare_models.py
-python scripts/error_analysis.py
+python scripts/visualize.py
 ```
 
 ---
