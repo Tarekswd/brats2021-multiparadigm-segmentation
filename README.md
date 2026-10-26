@@ -10,9 +10,9 @@ A complete, reproducible, research-grade deep learning system for the **RSNA-ASN
 
 This repository implements architectures inspired by the BraTS 2021 winning submission (**KAIST MRI Lab — Luu & Park, arXiv:2112.04653**), the 2nd-place entry (**SegResNet**), and the 3D Vision Transformer **Swin UNETR**, plus a multi-paradigm ensemble pipeline.
 
-> **Project status: no model has been trained or evaluated on the real BraTS 2021 dataset yet.**
-> All runs so far used 4 small synthetic mock volumes to check that the pipeline runs end to end.
-> The tables, figures and `research_report.*` files under `results/` and `submission_package/` are **illustrative placeholders, not measured results**. They will be replaced once real training finishes; see [CLOUD_TRAINING.md](CLOUD_TRAINING.md).
+> **Project status: one real-data run so far** — the 3D U-Net baseline, 5 epochs on the BraTS 2021 training set (see the table below).
+> All other architectures are implemented but **not yet trained on real data**.
+> The other tables, figures and `research_report.*` files under `results/` and `submission_package/` are **illustrative placeholders, not measured results**. Only `results/measured/` holds measured numbers. See [CLOUD_TRAINING.md](CLOUD_TRAINING.md) to reproduce.
 
 ---
 
@@ -37,12 +37,16 @@ This repository implements architectures inspired by the BraTS 2021 winning subm
 
 ## Key Architecture & Benchmark Highlights
 
-**Measured results: none yet.** No model has been trained on real BraTS 2021 data. This section will report the real per-epoch validation Dice and HD95 from `experiments/<run>/training_log.csv` once a cloud GPU run has finished ([CLOUD_TRAINING.md](CLOUD_TRAINING.md)).
+**Measured results** (validation Dice after the final epoch; Kaggle T4 GPU, run on 2026-10-26):
 
-| Model Architecture | WT Dice (%) | TC Dice (%) | ET Dice (%) | Data / split |
-|:---|:---:|:---:|:---:|:---|
-| 3D U-Net Baseline | pending | pending | pending | BraTS 2021 training set, 75/25 patient-level hold-out |
-| Winner-Inspired U-Net | pending | pending | pending | same split |
+| Model Architecture | Epochs | WT Dice (%) | TC Dice (%) | ET Dice (%) | Mean (%) | Data / split |
+|:---|:---:|:---:|:---:|:---:|:---:|:---|
+| 3D U-Net Baseline (`configs/baseline_unet.yaml`) | 5 | 80.5 | 62.9 | 66.2 | 69.9 | BraTS 2021 training set (1251 cases), seeded 75/25 patient-level hold-out, single run |
+| Winner-Inspired U-Net | – | not trained yet | | | | |
+
+- Per-epoch log: [`results/measured/baseline_unet_kaggle_2026-10-26_training_log.csv`](results/measured/baseline_unet_kaggle_2026-10-26_training_log.csv). Each epoch took about 56–58 min.
+- Only 5 epochs were trained and validation Dice was still trending upward, with dips (mean 61.2 % at epoch 1, 59.6 % at epoch 2, 69.9 % at epoch 5), so this is an **undertrained baseline**. Don't compare it with fully trained challenge entries. HD95 was not computed in this run.
+- One hold-out split and one seed, with no test set, so the numbers carry no confidence interval.
 
 For reference, published BraTS 2021 results come from the official challenge papers (e.g. Luu & Park, arXiv:2112.04653). They are not results of this repository.
 
